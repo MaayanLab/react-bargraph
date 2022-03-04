@@ -1,0 +1,54 @@
+[
+    {
+        "id": "Nerve_Tibial",
+        "score": 5.082118124986757
+    },
+    {
+        "id": "Heart_Atrial_Appendage",
+        "score": 4.727780002200718
+    },
+    {
+        "id": "Spleen",
+        "score": 4.5274775770831175
+    },
+    {
+        "id": "Artery_Coronary",
+        "score": 4.485904042270301
+    },
+    {
+        "id": "Adipose_Subcutaneous",
+        "score": 4.273105786748373
+    },
+    {
+        "id": "Whole_Blood",
+        "score": 4.2575922630753436
+    },
+    {
+        "id": "Heart_Left_Ventricle",
+        "score": 4.158230833966701
+    },
+    {
+        "id": "Artery_Aorta",
+        "score": 4.0621903360515415
+    },
+    {
+        "id": "Muscle_Skeletal",
+        "score": 4.038016348850266
+    },
+    {
+        "id": "Esophagus_Mucosa",
+        "score": 4.024235130347724
+    },
+    {
+        "id": "Skin_Sun_Exposed_Lower_leg",
+        "score": 3.8544866155520627
+    },
+    {
+        "id": "Cells_Cultured_fibroblasts",
+        "score": 3.707797110815793
+    },
+    {
+        "id": "Artery_Tibial",
+        "score": 3.646778349483127
+    }
+]
