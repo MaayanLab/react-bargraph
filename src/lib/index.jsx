@@ -1,4 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
+import 'chart.js/auto'
+import { Bar } from 'react-chartjs-2'
 
 function classes(...C) {
   if (C.length === 1 && typeof C[0] === 'object') {
@@ -14,184 +16,222 @@ function classes(...C) {
   }
 }
 
-export default function ReactSupervenn({
-  style,
-  sets,
-  set_annotations,
-  chunks,
-  composition_array,
-  effective_min_width_for_annotation,
-  col_widths,
-  n_items,
-  ycounts,
-  rotate_col_annotations,
-  color_by,
-  color_cycle,
-  alternating_background,
-}) {
-  const W = (w) => `${100 * w}%`
-  const H = (h) => `${100 * h}%`
-  const [selection, setSelection] = React.useState({})
-  const selectedSets = {}
-  const selectedItems = {}
-  for (const k in selection) {
-    if (!selection[k]) continue
-    const [row, col] = k.split('.')
-    selectedSets[set_annotations[row]] = true
-    for (const item of chunks[col]) {
-      selectedItems[item] = true
+const palette = [
+  "#ce9197",
+  "#8ee400",
+  "#c600ff",
+  "#e7ff32",
+  "#5e44ff",
+  "#e8cc2a",
+  "#005cff",
+  "#ffb800",
+  "#3e41cc",
+  "#27d370",
+  "#ff3bff",
+  "#006f00",
+  "#ff75ff",
+  "#006c00",
+  "#000078",
+  "#68de84",
+  "#002aa6",
+  "#ff8700",
+  "#0059cc",
+  "#ff3f00",
+  "#00ffff",
+  "#ba0000",
+  "#00ffc9",
+  "#ff338c",
+  "#00c97c",
+  "#3d2ca1",
+  "#ff6002",
+  "#0085f1",
+  "#b14400",
+  "#00ffff",
+  "#ff355b",
+  "#00d8f1",
+  "#ff386c",
+  "#7ef2d1",
+  "#000348",
+  "#df9040",
+  "#004bae",
+  "#ff995d",
+  "#0049a1",
+  "#876500",
+  "#bf84ff",
+  "#00651a",
+  "#f582ff",
+  "#006820",
+  "#ff9cff",
+  "#004600",
+  "#ff9bed",
+  "#003000",
+  "#ffabfe",
+  "#002c00",
+  "#ffa7ef",
+  "#002800",
+  "#5697ff",
+  "#873600",
+  "#00a9ff",
+  "#ff795b",
+  "#00a9ff",
+  "#363900",
+  "#4888ef",
+  "#0d2a00",
+  "#9092f3",
+  "#002600",
+  "#95389a",
+  "#00542f",
+  "#f26f98",
+  "#4fe7ff",
+  "#370000",
+  "#bbffff",
+  "#420014",
+  "#32dcff",
+  "#350500",
+  "#00c6fd",
+  "#351000",
+  "#00b7ff",
+  "#ec856c",
+  "#00b7ff",
+  "#783424",
+  "#00aff1",
+  "#ff919a",
+  "#002061",
+  "#e0beae",
+  "#0057ab",
+  "#bc7663",
+  "#75affc",
+  "#003e33",
+  "#ff8dbb",
+  "#002931",
+  "#ffd3ff",
+  "#007470",
+  "#ff99b5",
+  "#00aec2",
+  "#e8a8d5",
+  "#798275",
+  "#e0bdff",
+  "#6e5c7c",
+  "#88d6ff",
+  "#b599d1",
+  "#cee1f5",
+  "#9e9c99",
+  "#9bc3e3"
+]
+
+export default function ReactBarGraph(props) {
+
+  const [orientation, setOrientation] = useState(props.orientation)
+
+  function swapOrientation() {
+    if (orientation === "horizontal") {
+      setOrientation("vertical")
+    } else {
+      setOrientation("horizontal")
     }
   }
+
+  const data = props.data
+
+  const ids = new Array(data.length)
+  const scores = new Array(data.length)
+  const colors = new Array(data.length)
+
+  // deconstructing the JSON object into ids and scores
+  for (let i = 0; i < data.length; i++) {
+    ids[i] = data[i].id
+    scores[i] = data[i].score
+  }
+
+  var paletteIndex = 0;
+  for (let i = 0; i < data.length; i++) {
+
+    if (colors[i] == undefined) {
+
+      colors[i] = palette[paletteIndex]
+      
+      let firstWord = ids[i]
+
+      if (ids[i].indexOf('_') != -1) {
+        firstWord = ids[i].substring(0, ids[i].indexOf('_'))
+      }
+
+      for (let j = i+1; j < data.length; j++) {
+
+        let firstWord2 = ids[j]
+
+        if (ids[j].indexOf('_') != -1) {
+          firstWord2 = ids[j].substring(0, ids[j].indexOf('_'))
+        }
+        if (firstWord === firstWord2) {
+          colors[j] = palette[paletteIndex]
+        }  
+      }
+
+      paletteIndex++
+
+      if (paletteIndex >= paletteIndex.size) paletteIndex = 0
+    }
+  }
+
+  const graphData = {
+    labels: ids,
+    datasets: [
+      {
+        data: scores,
+        backgroundColor: colors,
+        borderColor: ["black"],
+        borderWidth: 1,
+      },
+    ],
+  }
+
+  var options
+
+  if (orientation == "vertical") {
+    options = {
+      indexAxis: 'x',
+      maintainAspectRatio: false,
+      plugins: {
+        title: {
+          display: true,
+          text: "Write title here",
+          font: {
+            size: 50
+          }
+        },
+        legend: {
+          display: false
+       }}
+    }
+  } else if (orientation == "horizontal") {
+    options = {
+      indexAxis: 'y',
+      maintainAspectRatio: false,
+      plugins: {
+        title: {
+          display: true,
+          text: "Write title here",
+          font: {
+            size: 50
+          }
+        },
+        legend: {
+          display: false
+       }}
+    }
+  } else {
+    throw new Error('Unsupported orientation')
+  }
+
   return (
-    <div
-      className={style.layout}
-    >
-      <div className={style.data}>
-        {composition_array.map((cells, row) => (
-          <div
-            key={row}
-            className={classes({ [style.alternate]: alternating_background && row % 2 == 0 })}
-          >
-            {cells.map((cell, col) => {
-              if (cell === 1) {
-                return (
-                  <div
-                    key={col}
-                    className={classes({
-                      [style.cell]: true,
-                      [style.selected]: selection[`${row}.${col}`],
-                    })}
-                    onClick={_ => {
-                      setSelection(
-                        selection => ({
-                          ...selection,
-                          [`${row}.${col}`]: !selection[`${row}.${col}`],
-                        })
-                      )
-                    }}
-                    style={{
-                      width: W(col_widths[col] / n_items),
-                      backgroundColor: color_by === 'column' ? color_cycle[col % color_cycle.length] : color_cycle[row % color_cycle.length],
-                      userSelect: 'none',
-                    }}>&nbsp;</div>
-                )
-              } else {
-                return (
-                  <div
-                    key={col}
-                    className={style.cell}
-                    style={{
-                      width: W(col_widths[col] / n_items),
-                      userSelect: 'none',
-                    }}>&nbsp;</div>
-                )
-              }
-            })}
-          </div>
-        ))}
+      
+       <div className={props.style.layout}>
+        <button className={props.style.button} onClick={()=>swapOrientation()}>Switch Orientation</button>
+          <Bar
+            data={graphData}
+            options={options}
+          />
       </div>
-      <div className={style.ylabel}>
-        <div>SETS (<span
-          className={style.clickable}
-          onClick={_ => {
-            navigator.clipboard.writeText(Object.keys(selectedSets).join('\n'))
-          }}>{Object.keys(selectedSets).length} sets</span>)
-        </div>
-      </div>
-      <div className={style.xlabel}>
-        ITEMS (<span 
-          className={style.clickable}
-          onClick={_ =>
-            navigator.clipboard.writeText(Object.keys(selectedItems).join('\n'))
-          }>{Object.keys(selectedItems).length} items</span>)
-      </div>
-      <div className={style.yticks}>
-        {sets.map((_, row) => (
-          <div
-            key={row}
-            title={JSON.stringify(sets[row])}
-          ><span>{set_annotations[row]}</span></div>
-        ))}
-      </div>
-      <div className={style.xticks}>
-        {chunks.map((chunk, col) => (
-          <div
-            key={col}
-            className={classes({ [style.rotated]: rotate_col_annotations })}
-            style={{
-              width: W(col_widths[col] / n_items),
-            }}
-            title={JSON.stringify(chunk)}>
-            <span>
-              {chunks[col].length >= effective_min_width_for_annotation ?
-                chunks[col].length
-                : null}
-            </span>
-          </div>
-        ))}
-      </div>
-      <div className={style.ycount}>
-        {chunks.map((chunk, col) => (
-          <div
-            key={col}
-            style={{
-              width: W(col_widths[col] / n_items),
-            }}
-            onClick={_ => {
-              setSelection(
-                selection => {
-                  const _selection = {...selection}
-                  for (const row in composition_array) {
-                    if (composition_array[row][col]) {
-                      _selection[`${row}.${col}`] = !_selection[`${row}.${col}`]
-                    }
-                  }
-                  return _selection
-                }
-              )
-            }}
-          >
-            <div
-              style={{
-                height: H(ycounts[col] / sets.length),
-              }}>
-                <span>
-                  {chunks[col].length >= effective_min_width_for_annotation ?
-                    ycounts[col]
-                    : null}
-                </span>
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className={style.xcount}>
-        {sets.map((_, row) => (
-          <div
-            key={row}
-            className={classes({ [style.alternate]: alternating_background && row % 2 == 0 })}
-            title={JSON.stringify(sets[row])}
-            onClick={_ => {
-              setSelection(
-                selection => {
-                  const _selection = {...selection}
-                  for (const col in Object.keys(chunks)) {
-                    if (composition_array[row][col]) {
-                      _selection[`${row}.${col}`] = !_selection[`${row}.${col}`]
-                    }
-                  }
-                  return _selection
-                }
-              )
-            }}
-          >
-            <div
-              style={{
-                width: W(sets[row].length / n_items),
-              }}
-            ><span>{sets[row].length}</span></div>
-          </div>
-        ))}
-      </div>
-    </div>
   )
 }

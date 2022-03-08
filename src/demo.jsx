@@ -3,19 +3,15 @@ import ReactDOM from 'react-dom'
 import Suspense from './components/Suspense'
 import { useAsyncResource } from 'use-async-resource'
 
-
-import ReactBarGraph from './react_barchart.jsx'
-// import ReactSupervennStyle from './lib/index.module.css'
-// const ReactSupervenn = React.lazy(() => import('./lib'))
+import ReactBarGraphStyle from './lib/index.module.css'
+const ReactBarGraph = React.lazy(() => import('./lib'))
 
 function Component({ getDemo }) {
 
   const demo = getDemo()
 
   return (
-    <div style={{ display: 'flex', flex: '1 1 auto', overflow: 'hidden' }}>
-      <ReactBarGraph data={ demo } />
-    </div>
+    <ReactBarGraph style={ReactBarGraphStyle} orientation={"horizontal"} data={demo} />
   )
 }
 

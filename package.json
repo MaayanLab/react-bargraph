@@ -1,7 +1,7 @@
 {
-  "name": "react-supervenn",
+  "name": "react-bargraph",
   "version": "0.0.1",
-  "description": "An interactive React implementation of [supervenn](https://github.com/gecko984/supervenn).",
+  "description": "A React implementation of a bar chart intended for use in Signature Commons Graph.",
   "main": "dist/lib/index.js",
   "module": "dist/lib/index.js",
   "scripts": {
@@ -13,14 +13,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MaayanLab/react-supervenn.git"
+    "url": "git+https://github.com/MaayanLab/react-bargraph.git"
   },
   "author": "MaayanLab",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/MaayanLab/react-supervenn/issues"
+    "url": "https://github.com/MaayanLab/react-bargraph/issues"
   },
-  "homepage": "https://github.com/MaayanLab/react-supervenn#readme",
+  "homepage": "https://github.com/MaayanLab/react-bargraph#readme",
   "devDependencies": {
     "@babel/cli": "^7.16.8",
     "@babel/plugin-transform-runtime": "^7.14.5",
@@ -43,7 +43,6 @@
     "webpack-dev-server": "^3.11.2"
   },
   "dependencies": {
-    "@babel/core": "^7.17.5",
     "chart.js": "^3.7.1",
     "react": "^17.0.2",
     "react-chartjs-2": "^4.0.1"

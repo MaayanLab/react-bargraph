@@ -3,11 +3,11 @@ const path = require('path');
 module.exports = function (_env, argv) {
   return {
     mode: 'production',
-    entry: './src/react_supervenn.jsx',
+    entry: './src/react_bargraph.jsx',
     output: {
-      path: path.resolve(__dirname, 'react_supervenn'),
-      filename: 'react_supervenn.js',
-      library: 'react_supervenn',
+      path: path.resolve(__dirname, 'react_bargraph'),
+      filename: 'react_bargraph.js',
+      library: 'react_bargraph',
       libraryTarget: 'umd',
       umdNamedDefine: true,
       globalObject: 'this',
@@ -30,11 +30,6 @@ module.exports = function (_env, argv) {
             'style-loader',
             'css-loader'
           ]
-        },
-        {
-          test: /\.svg$/,
-          resourceQuery: /svgr/,
-          use: ['@svgr/webpack'],
         },
         {
           test: /\.(png|jpg|gif|svg)$/i,
