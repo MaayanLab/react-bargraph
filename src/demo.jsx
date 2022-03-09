@@ -11,7 +11,9 @@ function Component({ getDemo }) {
   const demo = getDemo()
 
   return (
-    <ReactBarGraph style={ReactBarGraphStyle} orientation={"horizontal"} data={demo} />
+    <div style={{ display: 'flex', flex: '1 1 auto', overflow: 'hidden', margin: '5%' }}>
+      <ReactBarGraph style={ReactBarGraphStyle} title={"Demo React Bar Graph"} orientation={"horizontal"} data={demo} />
+    </div>
   )
 }
 

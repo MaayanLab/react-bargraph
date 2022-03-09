@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import 'chart.js/auto'
 import { Bar } from 'react-chartjs-2'
+import RotateLeftIcon from '@mui/icons-material/RotateLeft';
+import RotateRightIcon from '@mui/icons-material/RotateRight';
 
 function classes(...C) {
   if (C.length === 1 && typeof C[0] === 'object') {
@@ -122,6 +124,10 @@ const palette = [
 export default function ReactBarGraph(props) {
 
   const [orientation, setOrientation] = useState(props.orientation)
+  
+  React.useEffect(() => {
+    if (props.orientation !== undefined) setOrientation(props.orientation)
+  }, [props.orientation])
 
   function swapOrientation() {
     if (orientation === "horizontal") {
@@ -143,7 +149,7 @@ export default function ReactBarGraph(props) {
     scores[i] = data[i].score
   }
 
-  var paletteIndex = 0;
+  let paletteIndex = 0;
   for (let i = 0; i < data.length; i++) {
 
     if (colors[i] == undefined) {
@@ -186,16 +192,16 @@ export default function ReactBarGraph(props) {
     ],
   }
 
-  var options
+  const options = {}
 
   if (orientation == "vertical") {
-    options = {
+    Object.assign(options, {
       indexAxis: 'x',
       maintainAspectRatio: false,
       plugins: {
         title: {
           display: true,
-          text: "Write title here",
+          text: props.title,
           font: {
             size: 50
           }
@@ -203,15 +209,15 @@ export default function ReactBarGraph(props) {
         legend: {
           display: false
        }}
-    }
+    })
   } else if (orientation == "horizontal") {
-    options = {
+    Object.assign(options,{
       indexAxis: 'y',
       maintainAspectRatio: false,
       plugins: {
         title: {
           display: true,
-          text: "Write title here",
+          text: props.title,
           font: {
             size: 50
           }
@@ -219,19 +225,23 @@ export default function ReactBarGraph(props) {
         legend: {
           display: false
        }}
-    }
+    })
   } else {
     throw new Error('Unsupported orientation')
   }
 
   return (
       
-       <div className={props.style.layout}>
-        <button className={props.style.button} onClick={()=>swapOrientation()}>Switch Orientation</button>
-          <Bar
-            data={graphData}
-            options={options}
-          />
+      <div className={props.style.layout}>
+        {
+          orientation == "vertical" 
+            ? <RotateRightIcon className={props.style.button} onClick={()=>swapOrientation()}></RotateRightIcon> 
+            : <RotateLeftIcon className={props.style.button} onClick={()=>swapOrientation()}></RotateLeftIcon> 
+        }
+        <Bar
+          data={graphData}
+          options={options}
+        />
       </div>
   )
 }
