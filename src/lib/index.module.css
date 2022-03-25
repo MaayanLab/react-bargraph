@@ -36,3 +36,7 @@
 .button {
   transform: scale(1.5);
 }
+
+.graphDiv {
+  width: 100%;
+}
