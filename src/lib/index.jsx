@@ -6,6 +6,10 @@ import RotateRightIcon from '@mui/icons-material/RotateRight'
 import DownloadIcon from '@mui/icons-material/Download'
 import { IconButton } from '@mui/material'
 import Tooltip from '@mui/material/Tooltip'
+import html2canvas from 'html2canvas'
+import { jsPDF } from 'jspdf'
+import Menu from '@mui/material/Menu'
+import MenuItem from '@mui/material/MenuItem'
 
 function classes(...C) {
   if (C.length === 1 && typeof C[0] === 'object') {
@@ -24,10 +28,22 @@ function classes(...C) {
 export default function ReactBarGraph(props) {
 
   const [orientation, setOrientation] = useState(props.orientation)
+  const [anchorEl, setAnchorEl] = React.useState(null)
 
   React.useEffect(() => {
     if (props.orientation !== undefined) setOrientation(props.orientation)
   }, [props.orientation])
+
+  
+  const open = Boolean(anchorEl)
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget)
+  }
+  const handleClose = () => {
+    setAnchorEl(null)
+  }
+
+  const printRef = React.useRef()
 
   function swapOrientation() {
     if (orientation === "horizontal") {
@@ -35,6 +51,50 @@ export default function ReactBarGraph(props) {
     } else {
       setOrientation("horizontal")
     }
+  }
+
+  const handleDownloadToPNG = async () => {
+    const element = printRef.current
+    const canvas = await html2canvas(element)
+
+    const data = canvas.toDataURL('image/png')
+    const link = document.createElement('a')
+
+    if (typeof link.download === 'string') {
+      link.href = data
+      link.download = 'graph.png'
+
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    } else {
+      window.open(data)
+    }
+    handleClose()
+  }
+
+  const handleDownloadToSVG = async () => {
+    //TODO
+  }
+
+  const handleDownloadToEPS = async () => {
+    //TODO
+  }
+
+  const handleDownloadToPDF = async () => {
+    const element = printRef.current
+    const canvas = await html2canvas(element)
+    const data = canvas.toDataURL('image/png')
+
+    const pdf = new jsPDF()
+    const imgProperties = pdf.getImageProperties(data)
+    const pdfWidth = pdf.internal.pageSize.getWidth()
+    const pdfHeight =
+      (imgProperties.height * pdfWidth) / imgProperties.width
+
+    pdf.addImage(data, 'PNG', 0, 0, pdfWidth, pdfHeight)
+    pdf.save('graph.pdf')
+    handleClose()
   }
 
   const data = props.data
@@ -139,26 +199,48 @@ export default function ReactBarGraph(props) {
           {
             orientation == "vertical" 
               ? <Tooltip title="Horizontal View" placement="top">
-                  <IconButton className={props.style.button}>
-                    <RotateRightIcon onClick={()=>swapOrientation()} />
+                  <IconButton onClick={()=>swapOrientation()} className={props.style.button}>
+                    <RotateRightIcon />
                   </IconButton>
                 </Tooltip>
               : <Tooltip title="Vertical View" placement="top">
-                  <IconButton className={props.style.button}>
-                    <RotateLeftIcon onClick={()=>swapOrientation()} />
+                  <IconButton onClick={()=>swapOrientation()} className={props.style.button}>
+                    <RotateLeftIcon />
                   </IconButton>
                 </Tooltip> 
           }
-          <Tooltip title="Download Image" placement="top">
-            <IconButton className={props.style.button}>
+          <Tooltip title="Download Graph" placement="top">
+            <IconButton 
+              id="basic-button"
+              aria-controls={open ? 'basic-menu' : undefined}
+              aria-haspopup="true"
+              aria-expanded={open ? 'true' : undefined}
+              onClick={handleClick} 
+              className={props.style.button}>
               <DownloadIcon />
             </IconButton>
           </Tooltip>
+          <Menu
+            id="basic-menu"
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleClose}
+            MenuListProps={{
+              'aria-labelledby': 'basic-button',
+            }}
+          >
+            <MenuItem onClick={handleDownloadToPNG}>PNG</MenuItem>
+            <MenuItem onClick={handleDownloadToSVG}>SVG</MenuItem>
+            <MenuItem onClick={handleDownloadToEPS}>EPS</MenuItem>
+            <MenuItem onClick={handleDownloadToPDF}>PDF</MenuItem>
+          </Menu>
         </div>
-        <Bar
-          data={graphData}
-          options={options}
-        />
+        <div className={props.style.graphDiv} ref={printRef}>
+          <Bar
+            data={graphData}
+            options={options}
+          />
+        </div>
       </div>
   )
 }
