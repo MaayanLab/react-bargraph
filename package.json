@@ -10,7 +10,7 @@
     "build:esx": "NODE_ENV=production babel src/lib --out-dir dist/lib --copy-files",
     "build:demo": "webpack -c demo.webpack.config.js --mode production",
     "build": "npm run build:umd && npm run build:esx && npm run build:demo",
-    "deploy": "gh-pages -d dist/demo"
+    "deploy": "touch dist/demo/.nojekyll && gh-pages -d dist/demo -t true"
   },
   "repository": {
     "type": "git",
