@@ -8,6 +8,7 @@ import { IconButton } from '@mui/material'
 import Tooltip from '@mui/material/Tooltip'
 import html2canvas from 'html2canvas'
 import { jsPDF } from 'jspdf'
+import { saveAs } from 'file-saver'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 
@@ -33,7 +34,6 @@ export default function ReactBarGraph(props) {
   React.useEffect(() => {
     if (props.orientation !== undefined) setOrientation(props.orientation)
   }, [props.orientation])
-
   
   const open = Boolean(anchorEl)
   const handleClick = (event) => {
@@ -54,22 +54,12 @@ export default function ReactBarGraph(props) {
   }
 
   const handleDownloadToPNG = async () => {
-    const element = printRef.current
-    const canvas = await html2canvas(element)
 
-    const data = canvas.toDataURL('image/png')
-    const link = document.createElement('a')
-
-    if (typeof link.download === 'string') {
-      link.href = data
-      link.download = 'graph.png'
-
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-    } else {
-      window.open(data)
-    }
+    const canvasSave = document.getElementById('graph')
+    canvasSave.toBlob(function (blob) {
+        saveAs(blob, "graph.png")
+    })
+    
     handleClose()
   }
 
@@ -101,44 +91,12 @@ export default function ReactBarGraph(props) {
 
   const ids = new Array(data.length)
   const scores = new Array(data.length)
-  // const colors = new Array(data.length)
 
   // deconstructing the JSON object into ids and scores
   for (let i = 0; i < data.length; i++) {
     ids[i] = data[i].id
     scores[i] = data[i].score
   }
-
-  // let paletteIndex = 0;
-  // for (let i = 0; i < data.length; i++) {
-
-  //   if (colors[i] == undefined) {
-
-  //     colors[i] = palette[paletteIndex]
-      
-  //     let firstWord = ids[i]
-
-  //     if (ids[i].indexOf('_') != -1) {
-  //       firstWord = ids[i].substring(0, ids[i].indexOf('_'))
-  //     }
-
-  //     for (let j = i+1; j < data.length; j++) {
-
-  //       let firstWord2 = ids[j]
-
-  //       if (ids[j].indexOf('_') != -1) {
-  //         firstWord2 = ids[j].substring(0, ids[j].indexOf('_'))
-  //       }
-  //       if (firstWord === firstWord2) {
-  //         colors[j] = palette[paletteIndex]
-  //       }  
-  //     }
-
-  //     paletteIndex++
-
-  //     if (paletteIndex >= paletteIndex.size) paletteIndex = 0
-  //   }
-  // }
 
   const colors = (props.palette !== undefined) ? props.palette : ["blue"] 
 
@@ -230,13 +188,14 @@ export default function ReactBarGraph(props) {
             }}
           >
             <MenuItem onClick={handleDownloadToPNG}>PNG</MenuItem>
-            <MenuItem onClick={handleDownloadToSVG}>SVG</MenuItem>
-            <MenuItem onClick={handleDownloadToEPS}>EPS</MenuItem>
+            <MenuItem onClick={handleDownloadToSVG}>SVG (not functional yet)</MenuItem>
+            <MenuItem onClick={handleDownloadToEPS}>EPS (not functional yet)</MenuItem>
             <MenuItem onClick={handleDownloadToPDF}>PDF</MenuItem>
           </Menu>
         </div>
         <div className={props.style.graphDiv} ref={printRef}>
           <Bar
+            id="graph"
             data={graphData}
             options={options}
           />
