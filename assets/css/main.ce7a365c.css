@@ -1,0 +1,42 @@
+._3UVrhUTXcD0PkB4T_ZVPrd {
+  display: flex; 
+  flex: 1 1 auto; 
+  position: relative; 
+  overflow: hidden;
+}
+
+/* .rotateButton {
+  transform: scale(1.5);
+  position: absolute;
+  right: 5%;
+  top: 3%;
+}
+
+.rotateButton:hover {
+  box-shadow: 1px 1px 2px black, 0 0 25px blue, 0 0 5px darkblue 
+}
+
+.downloadButton {
+  transform: scale(1.5);
+  position: absolute;
+  right: 10%;
+  top: 3%;
+} */
+
+._3nFwyCUvB6sztg0sFnxb4_ {
+  position: absolute;
+  right: 10%;
+  top: 3%;
+  display: flex;
+  gap: 25px;
+  /* width: 100px;
+  display: flex; */
+}
+
+._2oJgG3-rMa3SvTgaWbDXBy {
+  transform: scale(1.5);
+}
+
+.v4FXbRIqdg3tjnAbeIBxS {
+  width: 100%;
+}
