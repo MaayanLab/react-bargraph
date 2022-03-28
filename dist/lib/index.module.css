@@ -5,9 +5,38 @@
   overflow: hidden;
 }
 
-.button {
+/* .rotateButton {
   transform: scale(1.5);
   position: absolute;
   right: 5%;
   top: 3%;
+}
+
+.rotateButton:hover {
+  box-shadow: 1px 1px 2px black, 0 0 25px blue, 0 0 5px darkblue 
+}
+
+.downloadButton {
+  transform: scale(1.5);
+  position: absolute;
+  right: 10%;
+  top: 3%;
+} */
+
+.toolBar {
+  position: absolute;
+  right: 10%;
+  top: 3%;
+  display: flex;
+  gap: 25px;
+  /* width: 100px;
+  display: flex; */
+}
+
+.button {
+  transform: scale(1.5);
+}
+
+.graphDiv {
+  width: 100%;
 }
