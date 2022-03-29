@@ -14,3 +14,7 @@ npm start
 ```bash
 npm run build:lib
 ```
+
+### Test site
+
+[https://maayanlab.github.io/react-bargraph/](https://maayanlab.github.io/react-bargraph/)
