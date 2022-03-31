@@ -45,6 +45,11 @@ export default function ReactBarGraph(props) {
 
   const printRef = React.useRef()
 
+  let displayTitle = true
+  if (props.title === undefined) {
+    displayTitle = false
+  }
+
   function swapOrientation() {
     if (orientation === "horizontal") {
       setOrientation("vertical")
@@ -120,7 +125,7 @@ export default function ReactBarGraph(props) {
       maintainAspectRatio: false,
       plugins: {
         title: {
-          display: true,
+          display: displayTitle,
           text: props.title,
           font: {
             size: 50
@@ -136,7 +141,7 @@ export default function ReactBarGraph(props) {
       maintainAspectRatio: false,
       plugins: {
         title: {
-          display: true,
+          display: displayTitle,
           text: props.title,
           font: {
             size: 50
