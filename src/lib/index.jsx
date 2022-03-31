@@ -53,6 +53,17 @@ export default function ReactBarGraph(props) {
     displayTitle = false
   }
 
+  let displayHorizontalOrientationXaxis = true
+  if (props.horizontalOrientationXaxis === undefined) {
+    displayHorizontalOrientationXaxis = false
+  }
+
+  let displayHorizontalOrientationYaxis = true
+  if (props.horizontalOrientationYaxis === undefined) {
+    displayHorizontalOrientationYaxis = false
+  }
+
+
   function swapOrientation() {
     if (orientation === "horizontal") {
       setOrientation("vertical")
@@ -166,8 +177,8 @@ export default function ReactBarGraph(props) {
     scoresToUse = reverseSortedScores
     idsToUse = reverseSortedIds
   }
-  
-  const palette = (props.palette !== undefined) ? props.palette : ["blue"]
+
+  const palette = (props.palette !== undefined) ? props.palette : ["darkred"]
   const colors = new Array(palette.length)
 
   // Creating gradient, if requested
@@ -215,7 +226,27 @@ export default function ReactBarGraph(props) {
         },
         legend: {
           display: false
-       }}
+       }},
+       scales: {
+        x: {
+          title: {
+            display: displayHorizontalOrientationYaxis,
+            text: props.horizontalOrientationYaxis,
+            font: {
+              size: 25
+            }
+          }
+        },
+        y: {
+          title: {
+            display: displayHorizontalOrientationXaxis,
+            text: props.horizontalOrientationXaxis,
+            font: {
+              size: 25
+            }
+          }
+        }
+      }
     })
   } else if (orientation == "horizontal") {
     Object.assign(options,{
@@ -231,7 +262,27 @@ export default function ReactBarGraph(props) {
         },
         legend: {
           display: false
-       }}
+       }},
+       scales: {
+        x: {
+          title: {
+            display: displayHorizontalOrientationXaxis,
+            text: props.horizontalOrientationXaxis,
+            font: {
+              size: 25
+            }
+          }
+        },
+        y: {
+          title: {
+            display: displayHorizontalOrientationYaxis,
+            text: props.horizontalOrientationYaxis,
+            font: {
+              size: 25
+            }
+          }
+        }
+      }   
     })
   } else {
     throw new Error('Unsupported orientation')
@@ -254,6 +305,11 @@ export default function ReactBarGraph(props) {
                   </IconButton>
                 </Tooltip> 
           }
+          <Tooltip title="Reverse Order" placement="top">
+            <IconButton onClick={()=>reverseOrder()} className={props.style.button}>
+              <SortIcon />
+            </IconButton>
+          </Tooltip>
           <Tooltip title="Download Graph" placement="top">
             <IconButton 
               id="basic-button"
@@ -263,11 +319,6 @@ export default function ReactBarGraph(props) {
               onClick={handleClick} 
               className={props.style.button}>
               <DownloadIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Reverse Order" placement="top">
-            <IconButton onClick={()=>reverseOrder()} className={props.style.button}>
-              <SortIcon />
             </IconButton>
           </Tooltip>
           <Menu

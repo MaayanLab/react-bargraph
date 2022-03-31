@@ -26,7 +26,7 @@ function Component({ getDemo }) {
 
   return (
     <div style={{ display: 'flex', flex: '1 1 auto', overflow: 'hidden', margin: '5%' }}>
-      <ReactBarGraph style={ReactBarGraphStyle} gradient={true} title={"Demo React Bar Graph"} orientation={"horizontal"} palette={palette} data={demo} />
+      <ReactBarGraph style={ReactBarGraphStyle} gradient={true} title={"Demo React Bar Graph"} horizontalOrientationXaxis={"Score"} horizontalOrientationYaxis={"Tissue"} orientation={"horizontal"} palette={palette} data={demo} />
     </div>
   )
 }
