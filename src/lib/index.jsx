@@ -5,12 +5,14 @@ import RotateLeftIcon from '@mui/icons-material/RotateLeft'
 import RotateRightIcon from '@mui/icons-material/RotateRight'
 import DownloadIcon from '@mui/icons-material/Download'
 import { IconButton } from '@mui/material'
+import SortIcon from '@mui/icons-material/Sort'
 import Tooltip from '@mui/material/Tooltip'
 import html2canvas from 'html2canvas'
 import { jsPDF } from 'jspdf'
 import { saveAs } from 'file-saver'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
+import colorGradient from 'javascript-color-gradient'
 
 function classes(...C) {
   if (C.length === 1 && typeof C[0] === 'object') {
@@ -29,6 +31,7 @@ function classes(...C) {
 export default function ReactBarGraph(props) {
 
   const [orientation, setOrientation] = useState(props.orientation)
+  const [sorted, setSorted] = useState(true)
   const [anchorEl, setAnchorEl] = React.useState(null)
 
   React.useEffect(() => {
@@ -55,6 +58,14 @@ export default function ReactBarGraph(props) {
       setOrientation("vertical")
     } else {
       setOrientation("horizontal")
+    }
+  }
+
+  function reverseOrder() {
+    if (sorted === true) {
+      setSorted(false)
+    } else {
+      setSorted(true)
     }
   }
 
@@ -97,19 +108,90 @@ export default function ReactBarGraph(props) {
   const ids = new Array(data.length)
   const scores = new Array(data.length)
 
-  // deconstructing the JSON object into ids and scores
+  // Deconstructing the JSON object into ids and scores
   for (let i = 0; i < data.length; i++) {
     ids[i] = data[i].id
     scores[i] = data[i].score
   }
 
-  const colors = (props.palette !== undefined) ? props.palette : ["blue"] 
+  // Rearranging values to achieve sorted order
+  // Note that we retain the original ids array and scores array so that we know which id corresponds to each score
+  const sortedIds = new Array(data.length)
+  const sortedScores = new Array(data.length)
+
+  for(let i = 0; i < data.length; i++) {
+    sortedScores[i] = scores[i]
+  }
+
+  // Bubblesort
+  for (let i = 0; i < data.length-1; i++) {
+    for (let j = 0; j < data.length-i-1; j++) {
+      if (sortedScores[j] > sortedScores[j+1]) {
+        let temp = sortedScores[j]
+        sortedScores[j] = sortedScores[j+1]
+        sortedScores[j+1] = temp
+      }
+    }
+  }
+
+  // Adjusting sortedIds
+  for(let i = 0; i < data.length; i++) {
+    let old_index = -1
+    for(let j = 0; j < data.length; j++) {
+        if (sortedScores[i] == scores[j]) {
+          old_index = j
+          break
+        }
+    }
+    sortedIds[i] = ids[old_index]
+  }
+
+  // Getting reverse sorted info
+  const reverseSortedIds = new Array(data.length)
+  const reverseSortedScores = new Array(data.length)
+
+  for (let i = 0; i < data.length; i++) {
+    reverseSortedIds[i] = sortedIds[data.length-1-i]
+    reverseSortedScores[i] = sortedScores[data.length-1-i]
+  }
+
+  // Choosing whether to use sorted or reverse sorted order
+  let scoresToUse
+  let idsToUse
+
+  if (sorted) {
+    scoresToUse = sortedScores
+    idsToUse = sortedIds
+  } else {
+    scoresToUse = reverseSortedScores
+    idsToUse = reverseSortedIds
+  }
+  
+  const palette = (props.palette !== undefined) ? props.palette : ["blue"]
+  const colors = new Array(palette.length)
+
+  // Creating gradient, if requested
+  if (props.gradient === undefined || props.gradient != true) {
+    for (let i = 0; i < palette.length; i++) {
+      colors[i] = palette[i]
+    }
+  } else {
+
+      const colorArr = colorGradient
+        .setGradient("#590000", "#FF7F7F")
+        .setMidpoint(data.length)
+        .getArray();
+
+    for (let i = 0; i < data.length; i++) {
+      colors[i] = colorArr[i]
+    }
+  }
 
   const graphData = {
-    labels: ids,
+    labels: idsToUse,
     datasets: [
       {
-        data: scores,
+        data: scoresToUse,
         backgroundColor: colors,
         borderColor: ["black"],
         borderWidth: 1,
@@ -181,6 +263,11 @@ export default function ReactBarGraph(props) {
               onClick={handleClick} 
               className={props.style.button}>
               <DownloadIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Reverse Order" placement="top">
+            <IconButton onClick={()=>reverseOrder()} className={props.style.button}>
+              <SortIcon />
             </IconButton>
           </Tooltip>
           <Menu
