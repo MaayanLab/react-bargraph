@@ -204,8 +204,8 @@ export default function ReactBarGraph(props) {
       {
         data: scoresToUse,
         backgroundColor: colors,
-        borderColor: ["black"],
-        borderWidth: 1,
+        // borderColor: ["black"],
+        // borderWidth: 1,
       },
     ],
   }
@@ -235,6 +235,10 @@ export default function ReactBarGraph(props) {
             font: {
               size: 25
             }
+          }, 
+          ticks: {
+            maxRotation: 90,
+            minRotation: 30
           }
         },
         y: {
