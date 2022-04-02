@@ -6,6 +6,7 @@ import RotateRightIcon from '@mui/icons-material/RotateRight'
 import DownloadIcon from '@mui/icons-material/Download'
 import { IconButton } from '@mui/material'
 import SortIcon from '@mui/icons-material/Sort'
+import PaletteIcon from '@mui/icons-material/Palette'
 import Tooltip from '@mui/material/Tooltip'
 import html2canvas from 'html2canvas'
 import { jsPDF } from 'jspdf'
@@ -13,6 +14,9 @@ import { saveAs } from 'file-saver'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import colorGradient from 'javascript-color-gradient'
+import { ChromePicker } from 'react-color'
+import Popover from '@mui/material/Popover'
+import Color from 'color'
 
 function classes(...C) {
   if (C.length === 1 && typeof C[0] === 'object') {
@@ -32,20 +36,36 @@ export default function ReactBarGraph(props) {
 
   const [orientation, setOrientation] = useState(props.orientation)
   const [sorted, setSorted] = useState(true)
-  const [anchorEl, setAnchorEl] = React.useState(null)
+  const [downloadMenuAnchorEl, setDownloadMenuAnchorEl] = useState(null)
+  const [colorPickerAnchorEl, setColorPickerAnchorEl] = useState(null)
+  const [selectedColor, setSelectedColor] = useState({hex: "#590000", rgb: {r:89, g:0, b:0}})
 
   React.useEffect(() => {
     if (props.orientation !== undefined) setOrientation(props.orientation)
   }, [props.orientation])
   
-  const open = Boolean(anchorEl)
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget)
+  // Download menu
+  const downloadMenuOpen = Boolean(downloadMenuAnchorEl)
+  const handleDownloadMenuClick = (event) => {
+    setDownloadMenuAnchorEl(event.currentTarget)
   }
-  const handleClose = () => {
-    setAnchorEl(null)
+  const handleDownloadMenuClose = () => {
+    setDownloadMenuAnchorEl(null)
   }
 
+  // Color picker popover
+  const handleColorPickerClick = (event) => {
+    setColorPickerAnchorEl(event.currentTarget);
+  }
+
+  const handleColorPickerClose = () => {
+    setColorPickerAnchorEl(null);
+  }
+
+  const colorPickerOpen = Boolean(colorPickerAnchorEl);
+  const id = colorPickerOpen ? 'simple-popover' : undefined;
+
+  // For downloading graph
   const printRef = React.useRef()
 
   let displayTitle = true
@@ -157,27 +177,6 @@ export default function ReactBarGraph(props) {
     sortedIds[i] = ids[old_index]
   }
 
-  // Getting reverse sorted info
-  const reverseSortedIds = new Array(data.length)
-  const reverseSortedScores = new Array(data.length)
-
-  for (let i = 0; i < data.length; i++) {
-    reverseSortedIds[i] = sortedIds[data.length-1-i]
-    reverseSortedScores[i] = sortedScores[data.length-1-i]
-  }
-
-  // Choosing whether to use sorted or reverse sorted order
-  let scoresToUse
-  let idsToUse
-
-  if (sorted) {
-    scoresToUse = sortedScores
-    idsToUse = sortedIds
-  } else {
-    scoresToUse = reverseSortedScores
-    idsToUse = reverseSortedIds
-  }
-
   const palette = (props.palette !== undefined) ? props.palette : ["darkred"]
   const colors = new Array(palette.length)
 
@@ -188,14 +187,37 @@ export default function ReactBarGraph(props) {
     }
   } else {
 
-      const colorArr = colorGradient
-        .setGradient("#590000", "#FF7F7F")
-        .setMidpoint(data.length)
-        .getArray();
+    const maxValue = sortedScores[data.length - 1]
 
     for (let i = 0; i < data.length; i++) {
-      colors[i] = colorArr[i]
+      colors[i] = Color.rgb(selectedColor.rgb.r, selectedColor.rgb.g, selectedColor.rgb.b).lighten(sortedScores[i]/maxValue).hex()
     }
+  }
+
+  // Getting reverse sorted info
+  const reverseSortedIds = new Array(data.length)
+  const reverseSortedScores = new Array(data.length)
+  const reversedColors = new Array(data.length)
+
+  for (let i = 0; i < data.length; i++) {
+    reverseSortedIds[i] = sortedIds[data.length-1-i]
+    reverseSortedScores[i] = sortedScores[data.length-1-i]
+    reversedColors[i] = colors[data.length-1-i]
+  }
+
+  // Choosing whether to use sorted or reverse sorted order
+  let scoresToUse
+  let idsToUse
+  let colorsToUse
+
+  if (sorted) {
+    scoresToUse = sortedScores
+    idsToUse = sortedIds
+    colorsToUse = colors
+  } else {
+    scoresToUse = reverseSortedScores
+    idsToUse = reverseSortedIds
+    colorsToUse = reversedColors
   }
 
   const graphData = {
@@ -203,7 +225,7 @@ export default function ReactBarGraph(props) {
     datasets: [
       {
         data: scoresToUse,
-        backgroundColor: colors,
+        backgroundColor: colorsToUse,
         // borderColor: ["black"],
         // borderWidth: 1,
       },
@@ -314,22 +336,43 @@ export default function ReactBarGraph(props) {
               <SortIcon />
             </IconButton>
           </Tooltip>
+          <Tooltip title="Change Color" placement="top">
+            <IconButton className={props.style.button} aria-describedby={id} variant="contained" onClick={handleColorPickerClick}>
+              <PaletteIcon />
+            </IconButton>
+          </Tooltip>      
+          <Popover
+            id={id}
+            open={colorPickerOpen}
+            anchorEl={colorPickerAnchorEl}
+            onClose={handleColorPickerClose}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'center',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'center',
+            }}
+          >
+          <ChromePicker disableAlpha= { true } color={ selectedColor } onChangeComplete={ setSelectedColor } />
+      </Popover>
           <Tooltip title="Download Graph" placement="top">
             <IconButton 
               id="basic-button"
-              aria-controls={open ? 'basic-menu' : undefined}
+              aria-controls={downloadMenuOpen ? 'basic-menu' : undefined}
               aria-haspopup="true"
-              aria-expanded={open ? 'true' : undefined}
-              onClick={handleClick} 
+              aria-expanded={downloadMenuOpen ? 'true' : undefined}
+              onClick={handleDownloadMenuClick} 
               className={props.style.button}>
               <DownloadIcon />
             </IconButton>
           </Tooltip>
           <Menu
             id="basic-menu"
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
+            anchorEl={downloadMenuAnchorEl}
+            open={downloadMenuOpen}
+            onClose={handleDownloadMenuClose}
             MenuListProps={{
               'aria-labelledby': 'basic-button',
             }}
@@ -347,6 +390,7 @@ export default function ReactBarGraph(props) {
             options={options}
           />
         </div>
+              
       </div>
   )
 }
