@@ -13,10 +13,9 @@ import { jsPDF } from 'jspdf'
 import { saveAs } from 'file-saver'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
-import colorGradient from 'javascript-color-gradient'
 import { ChromePicker } from 'react-color'
 import Popover from '@mui/material/Popover'
-import Color from 'color'
+import Values from 'values.js'
 
 function classes(...C) {
   if (C.length === 1 && typeof C[0] === 'object') {
@@ -188,9 +187,13 @@ export default function ReactBarGraph(props) {
   } else {
 
     const maxValue = sortedScores[data.length - 1]
+    const minValue = sortedScores[0]
 
     for (let i = 0; i < data.length; i++) {
-      colors[i] = Color.rgb(selectedColor.rgb.r, selectedColor.rgb.g, selectedColor.rgb.b).lighten(sortedScores[i]/maxValue).hex()
+
+      const darkestColor = new Values(String(selectedColor.hex))
+      colors[i] = darkestColor.tint(100 * (1 - (sortedScores[i]/maxValue))).hexString()
+
     }
   }
 
@@ -336,27 +339,34 @@ export default function ReactBarGraph(props) {
               <SortIcon />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Change Color" placement="top">
-            <IconButton className={props.style.button} aria-describedby={id} variant="contained" onClick={handleColorPickerClick}>
-              <PaletteIcon />
-            </IconButton>
-          </Tooltip>      
-          <Popover
-            id={id}
-            open={colorPickerOpen}
-            anchorEl={colorPickerAnchorEl}
-            onClose={handleColorPickerClose}
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'center',
-            }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'center',
-            }}
-          >
-          <ChromePicker disableAlpha= { true } color={ selectedColor } onChangeComplete={ setSelectedColor } />
-      </Popover>
+          {
+            props.gradient && (
+            <>
+              <Tooltip title="Change Color" placement="top">
+                <IconButton className={props.style.button} aria-describedby={id} variant="contained" onClick={handleColorPickerClick}>
+                  <PaletteIcon />
+                </IconButton>
+              </Tooltip>      
+              <Popover
+                id={id}
+                open={colorPickerOpen}
+                anchorEl={colorPickerAnchorEl}
+                onClose={handleColorPickerClose}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'center',
+                }}
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'center',
+                }}
+              >
+                <ChromePicker disableAlpha= { true } color={ selectedColor } onChangeComplete={ setSelectedColor } />
+              </Popover>
+            </>
+          )
+          }
+  
           <Tooltip title="Download Graph" placement="top">
             <IconButton 
               id="basic-button"
