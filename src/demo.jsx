@@ -32,7 +32,7 @@ function Component({ getDemo }) {
 }
 
 function App() {
-  const [getDemo] = useAsyncResource(() => import('./demo.json'), []);
+  const [getDemo] = useAsyncResource(() => import('./bigDemo.json'), []);
   return (
     <Suspense>
       <Component getDemo={getDemo} />

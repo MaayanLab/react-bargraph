@@ -7,6 +7,8 @@ import DownloadIcon from '@mui/icons-material/Download'
 import { IconButton } from '@mui/material'
 import SortIcon from '@mui/icons-material/Sort'
 import PaletteIcon from '@mui/icons-material/Palette'
+import ArrowLeftIcon from '@mui/icons-material/ArrowLeft'
+import ArrowRightIcon from '@mui/icons-material/ArrowRight'
 import Tooltip from '@mui/material/Tooltip'
 import html2canvas from 'html2canvas'
 import { jsPDF } from 'jspdf'
@@ -38,6 +40,7 @@ export default function ReactBarGraph(props) {
   const [downloadMenuAnchorEl, setDownloadMenuAnchorEl] = useState(null)
   const [colorPickerAnchorEl, setColorPickerAnchorEl] = useState(null)
   const [selectedColor, setSelectedColor] = useState({hex: "#590000", rgb: {r:89, g:0, b:0}})
+  const [startIndex, setStartIndex] = useState(0)
 
   React.useEffect(() => {
     if (props.orientation !== undefined) setOrientation(props.orientation)
@@ -187,7 +190,7 @@ export default function ReactBarGraph(props) {
   } else {
 
     const maxValue = sortedScores[data.length - 1]
-    const minValue = sortedScores[0]
+    // const minValue = sortedScores[0]
 
     for (let i = 0; i < data.length; i++) {
 
@@ -208,19 +211,34 @@ export default function ReactBarGraph(props) {
     reversedColors[i] = colors[data.length-1-i]
   }
 
-  // Choosing whether to use sorted or reverse sorted order
+  // Checking if the startIndex has gone out of bounds
+  if (startIndex < 0) setStartIndex(0)
+  if (startIndex > data.length) setStartIndex(data.length - (data.length % 10))
+  if (startIndex == data.length) setStartIndex(data.length - 10)
+
+  // Choosing whether to use sorted or reverse sorted order 
+  // Also selecting specific data to display using startIndex
+
   let scoresToUse
   let idsToUse
   let colorsToUse
 
   if (sorted) {
-    scoresToUse = sortedScores
-    idsToUse = sortedIds
-    colorsToUse = colors
+    scoresToUse = sortedScores.slice(startIndex, startIndex + 10)
+    idsToUse = sortedIds.slice(startIndex, startIndex + 10)
+    colorsToUse = colors.slice(startIndex, startIndex + 10)
   } else {
-    scoresToUse = reverseSortedScores
-    idsToUse = reverseSortedIds
-    colorsToUse = reversedColors
+
+    if (data.length - (startIndex + 10) >= 0) {
+      scoresToUse = reverseSortedScores.slice(data.length - (startIndex + 10), data.length - startIndex)
+      idsToUse = reverseSortedIds.slice(data.length - (startIndex + 10), data.length - startIndex)
+      colorsToUse = reversedColors.slice(data.length - (startIndex + 10), data.length - startIndex)
+    } else {
+      scoresToUse = reverseSortedScores.slice(0, data.length % 10)
+      idsToUse = reverseSortedIds.slice(0, data.length % 10)
+      colorsToUse = reversedColors.slice(0, data.length % 10)
+    }
+      
   }
 
   const graphData = {
@@ -392,6 +410,16 @@ export default function ReactBarGraph(props) {
             <MenuItem onClick={handleDownloadToEPS}>EPS (not functional yet)</MenuItem>
             <MenuItem onClick={handleDownloadToPDF}>PDF</MenuItem>
           </Menu>
+          <Tooltip title="Cycle Left" placement="top">
+            <IconButton onClick={() => setStartIndex(startIndex - 10)} className={props.style.button}>
+              <ArrowLeftIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Cycle Right" placement="top">
+            <IconButton onClick={() => setStartIndex(startIndex + 10)}className={props.style.button}>
+              <ArrowRightIcon />
+            </IconButton>
+          </Tooltip>
         </div>
         <div className={props.style.graphDiv} ref={printRef}>
           <Bar
