@@ -281,7 +281,10 @@ export default function ReactBarGraph(props) {
           }, 
           ticks: {
             maxRotation: 90,
-            minRotation: 30
+            minRotation: 30,
+            font: {
+              size: 20
+            }
           }
         },
         y: {
@@ -290,6 +293,11 @@ export default function ReactBarGraph(props) {
             text: props.horizontalOrientationXaxis,
             font: {
               size: 25
+            }
+          },
+          ticks: {
+            font: {
+              size: 20
             }
           }
         }
@@ -318,6 +326,11 @@ export default function ReactBarGraph(props) {
             font: {
               size: 25
             }
+          },
+          ticks: {
+            font: {
+              size: 20
+            }
           }
         },
         y: {
@@ -326,6 +339,11 @@ export default function ReactBarGraph(props) {
             text: props.horizontalOrientationYaxis,
             font: {
               size: 25
+            }
+          },
+          ticks: {
+            font: {
+                size: 20
             }
           }
         }
