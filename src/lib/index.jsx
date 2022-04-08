@@ -182,6 +182,8 @@ export default function ReactBarGraph(props) {
   const palette = (props.palette !== undefined) ? props.palette : ["darkred"]
   const colors = new Array(palette.length)
 
+  const maxValue = sortedScores[data.length - 1]
+
   // Creating gradient, if requested
   if (props.gradient === undefined || props.gradient != true) {
     for (let i = 0; i < palette.length; i++) {
@@ -189,7 +191,7 @@ export default function ReactBarGraph(props) {
     }
   } else {
 
-    const maxValue = sortedScores[data.length - 1]
+    
     // const minValue = sortedScores[0]
 
     for (let i = 0; i < data.length; i++) {
@@ -288,6 +290,8 @@ export default function ReactBarGraph(props) {
           }
         },
         y: {
+          min: 0,
+          max: maxValue,
           title: {
             display: displayHorizontalOrientationXaxis,
             text: props.horizontalOrientationXaxis,
@@ -320,6 +324,8 @@ export default function ReactBarGraph(props) {
        }},
        scales: {
         x: {
+          min: 0,
+          max: maxValue,
           title: {
             display: displayHorizontalOrientationXaxis,
             text: props.horizontalOrientationXaxis,
